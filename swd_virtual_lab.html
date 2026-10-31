@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shortwave Diathermy – Biomedical Virtual Lab</title>
+<style>
+:root{--blue:#0b5394;--blue2:#1e88c7;--cyan:#d9f5fb;--cyan2:#7fd8ec;--ink:#0d2b40;--mut:#4b6a7d;--ok:#1b8a4b;--bad:#c0392b;--card:#fff;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:linear-gradient(180deg,#eef9fc,#fff 40%);line-height:1.55}
+header{position:sticky;top:0;z-index:20;background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 2px 12px #0b53944d}
+header .bar{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;gap:10px;flex-wrap:wrap}
+.brand{font-weight:700;letter-spacing:.3px}
+.brand small{display:block;font-weight:400;opacity:.85;font-size:12px}
+nav a{color:#fff;text-decoration:none;margin-left:14px;padding:6px 10px;border-radius:8px;font-size:14px;opacity:.9}
+nav a:hover,nav a.on{background:#ffffff26;opacity:1}
+main{max-width:1200px;margin:auto;padding:20px 18px 60px}
+section.page{display:none;animation:fade .45s ease}
+section.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(26px,4vw,40px);margin:.2em 0;color:var(--blue)}
+h2{color:var(--blue);border-left:5px solid var(--cyan2);padding-left:10px;margin-top:0}
+h3{color:var(--blue2);margin:.4em 0}
+.card{background:var(--card);border-radius:var(--r);padding:20px;box-shadow:0 4px 18px #0b539414;margin-bottom:18px;transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 26px #0b539422}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.hero{display:grid;gap:24px;grid-template-columns:1.1fr 1fr;align-items:center}
+@media(max-width:800px){.hero,.split{grid-template-columns:1fr!important}}
+.split{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+.btn{display:inline-block;border:0;cursor:pointer;background:linear-gradient(90deg,var(--blue),var(--blue2));color:#fff;padding:11px 20px;border-radius:10px;font-weight:600;font-size:15px;transition:transform .15s,filter .15s;margin:4px 4px 4px 0}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.btn.big{padding:16px 34px;font-size:18px;box-shadow:0 6px 20px #1e88c766;animation:pulse 2.4s infinite}
+.btn.sec{background:var(--cyan);color:var(--blue)}
+.btn:disabled{opacity:.45;cursor:not-allowed;animation:none}
+@keyframes pulse{0%,100%{box-shadow:0 6px 20px #1e88c766}50%{box-shadow:0 6px 30px #1e88c7aa}}
+.note{background:var(--cyan);border-left:4px solid var(--blue2);padding:10px 14px;border-radius:8px;font-size:14px;margin:10px 0}
+.warn{background:#fff4e5;border-left:4px solid #e67e22}
+.team{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.team div{background:var(--cyan);border-radius:10px;padding:10px 12px;font-size:14px}
+.team b{display:block;color:var(--blue)}
+.tag{display:inline-block;background:var(--cyan);color:var(--blue);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-right:6px}
+svg{max-width:100%;height:auto}
+.hl{cursor:pointer;transition:filter .2s}
+.hl:hover{filter:drop-shadow(0 0 6px #1e88c7)}
+.hl.sel rect{stroke:#e67e22;stroke-width:3}
+#info{min-height:70px;background:var(--cyan);border-radius:10px;padding:12px;font-size:14px}
+.panel{background:linear-gradient(160deg,#0f3c5a,#0a2638);color:#cfeaf5;border-radius:16px;padding:18px;box-shadow:inset 0 0 30px #000a}
+.lcd{background:#031a24;color:#6ff0ff;font-family:ui-monospace,Menlo,monospace;border-radius:8px;padding:8px 12px;font-size:18px;border:1px solid #1e88c755;display:inline-block;min-width:110px;text-align:center}
+.lamp{width:22px;height:22px;border-radius:50%;background:#3a2a2a;border:2px solid #555;display:inline-block;vertical-align:middle;transition:all .4s}
+.lamp.on{background:#ffd23f;box-shadow:0 0 18px #ffd23fcc,0 0 40px #ffd23f88}
+.ctl{margin:10px 0}
+.ctl label{display:block;font-size:13px;color:#9fd3e6;margin-bottom:4px}
+input[type=range]{width:100%;accent-color:var(--cyan2)}
+.toggle{padding:9px 16px;border-radius:24px;border:0;font-weight:700;cursor:pointer;background:#555;color:#fff;transition:.3s}
+.toggle.on{background:#1b8a4b}
+.meter{width:100%;max-width:300px;margin:auto}
+.progress{height:14px;background:#d6eef5;border-radius:10px;overflow:hidden}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--blue2),var(--ok));transition:width .5s}
+.check{list-style:none;padding:0;margin:0}
+.check li{padding:9px 12px;border-radius:10px;margin:6px 0;background:#f2fbfd;border:1px solid #cdeef6;transition:all .4s;font-size:14px}
+.check li.done{background:#e3f7ea;border-color:#9ddcb2;text-decoration:line-through;color:#4b7a5a}
+.check li.done::before{content:"✔ "}
+.opt{display:block;width:100%;text-align:left;padding:11px 14px;margin:7px 0;border:2px solid #cdeef6;border-radius:10px;background:#fff;cursor:pointer;font-size:15px;transition:.2s}
+.opt:hover{border-color:var(--blue2);background:var(--cyan)}
+.opt.sel{border-color:var(--blue);background:var(--cyan)}
+.opt.right{border-color:var(--ok);background:#e3f7ea}
+.opt.wrong{border-color:var(--bad);background:#fbe5e2}
+.fb{padding:10px 14px;border-radius:10px;margin-top:10px;font-size:14px;display:none}
+.fb.show{display:block;animation:fade .4s}
+.fb.ok{background:#e3f7ea;color:#14603a}.fb.no{background:#fbe5e2;color:#8a2a1f}
+.hm{position:relative}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:24px;border-top:1px solid #d6eef5}
+@media print{header,footer,.noprint{display:none}section.page{display:block!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Biomedical Engineering Virtual Lab<small>Shortwave Diathermy · 21BMC402J</small></div>
+    <nav id="nav">
+      <a href="#home" data-p="home">Home</a>
+      <a href="#theory" data-p="theory">Theory</a>
+      <a href="#experiment" data-p="experiment">Experiment</a>
+      <a href="#procedure" data-p="procedure">Procedure</a>
+      <a href="#quiz" data-p="quiz">Quiz</a>
+      <a href="#result" data-p="result">Result</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ================= HOME ================= -->
+<section class="page" id="home">
+  <div class="hero">
+    <div>
+      <span class="tag">Biomedical Engineering Virtual Laboratory</span>
+      <h1>Shortwave Diathermy</h1>
+      <p><b>Course:</b> 21BMC402J – Biomedical Equipments for Clinical Applications<br>
+      <b>Project:</b> VIRTUAL LAB – SHORTWAVE DIATHERMY</p>
+      <p>Shortwave diathermy (SWD) uses high-frequency alternating current at 27.12 MHz to produce heat deep within body tissues. This virtual lab lets students study the oscillating circuit, the patient resonator, and the tuning process through an interactive simulation of an SWD unit.</p>
+      <p class="note">This virtual lab allows students to understand the working principle and operation of a Shortwave Diathermy unit through simulation. It is an educational simulation only and is not a clinical or treatment tool.</p>
+      <button class="btn big" onclick="go('experiment')">▶ START VIRTUAL LAB</button>
+    </div>
+    <div class="card" style="text-align:center">
+      <svg viewBox="0 0 420 300" aria-label="Shortwave diathermy unit illustration">
+        <rect x="60" y="50" width="300" height="200" rx="18" fill="#dfe8ee" stroke="#0b5394" stroke-width="3"/>
+        <rect x="80" y="70" width="260" height="70" rx="8" fill="#0f3c5a"/>
+        <rect x="95" y="85" width="70" height="30" rx="4" fill="#031a24"/><text x="130" y="105" fill="#6ff0ff" font-size="14" text-anchor="middle" font-family="monospace">27.12</text>
+        <circle cx="200" cy="105" r="12" fill="#ffd23f"/>
+        <circle cx="260" cy="105" r="16" fill="#7fd8ec" stroke="#fff" stroke-width="3"/>
+        <circle cx="310" cy="105" r="10" fill="#ffd23f"/>
+        <g fill="#0b5394"><circle cx="130" cy="180" r="22"/><circle cx="210" cy="180" r="22"/><circle cx="290" cy="180" r="22"/></g>
+        <g fill="#fff"><rect x="122" y="176" width="16" height="4"/><rect x="202" y="176" width="16" height="4"/><rect x="282" y="176" width="16" height="4"/></g>
+        <rect x="100" y="230" width="220" height="12" rx="4" fill="#9fb7c4"/>
+        <path d="M30 150 q-20 20 0 40" fill="none" stroke="#1e88c7" stroke-width="3"/><path d="M380 130 q20 20 0 40" fill="none" stroke="#1e88c7" stroke-width="3"/>
+      </svg>
+      <p style="font-size:13px;color:var(--mut)">Illustrative schematic of an SWD unit</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Team Members</h2>
+    <div class="team">
+      <div><b>Hema G</b>RA2311013010006</div>
+      <div><b>Rithvika Shekar</b>RA2311013010043</div>
+      <div><b>Nandhini Settu</b>RA2311013010048</div>
+      <div><b>Abinayavalli C</b>RA2311013010055</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>📘 Theory</h3><p>Aim, equipment, principle, interactive circuit diagram and circuit description.</p><button class="btn sec" onclick="go('theory')">Open Theory</button></div>
+    <div class="card"><h3>🧪 Experiment</h3><p>Operate a virtual SWD unit: power, timer, intensity, tuning and electrode placement.</p><button class="btn sec" onclick="go('experiment')">Open Experiment</button></div>
+    <div class="card"><h3>❓ Quiz</h3><p>12 multiple-choice questions with instant feedback and a final score.</p><button class="btn sec" onclick="go('quiz')">Open Quiz</button></div>
+  </div>
+</section>
+
+<!-- ================= THEORY ================= -->
+<section class="page" id="theory">
+  <h1>Theory</h1>
+  <div class="card"><h2>A. Aim</h2><p>To study the working of Shortwave Diathermy.</p></div>
+
+  <div class="card"><h2>B. Equipment and Accessories Required</h2>
+    <div class="grid">
+      <div class="card" style="margin:0"><svg viewBox="0 0 200 120"><rect x="30" y="20" width="140" height="80" rx="10" fill="#0f3c5a"/><rect x="45" y="35" width="50" height="22" fill="#031a24"/><circle cx="130" cy="46" r="10" fill="#ffd23f"/><circle cx="110" cy="80" r="8" fill="#7fd8ec"/><circle cx="150" cy="80" r="8" fill="#7fd8ec"/></svg><b>Diathermy Unit – 1</b></div>
+      <div class="card" style="margin:0"><svg viewBox="0 0 200 120"><rect x="30" y="30" width="60" height="60" rx="6" fill="#bfe9f5" stroke="#0b5394" stroke-width="2"/><rect x="110" y="30" width="60" height="60" rx="6" fill="#bfe9f5" stroke="#0b5394" stroke-width="2"/><line x1="90" y1="60" x2="110" y2="60" stroke="#0b5394" stroke-width="3"/></svg><b>Electrode Pads (condenser) – 1</b></div>
+      <div class="card" style="margin:0"><svg viewBox="0 0 200 120"><path d="M20 60 Q50 10 80 60 T140 60 T200 60" fill="none" stroke="#1e88c7" stroke-width="6" stroke-linecap="round"/><circle cx="20" cy="60" r="6" fill="#0b5394"/><circle cx="180" cy="60" r="6" fill="#0b5394"/></svg><b>Connecting Cables – as required</b></div>
+    </div>
+  </div>
+
+  <div class="card"><h2>C. Introduction to Shortwave Diathermy</h2>
+    <p>The term <b>diathermy</b> means "through heating", i.e. producing deep heating directly in the tissues of the body.</p>
+    <p>Externally applied heat sources such as hot towels, infrared lamps and electric heating pads may cause discomfort and skin burns before sufficient heat reaches deeper tissues.</p>
+    <p>In diathermy, the body becomes part of the electrical circuit and heat is produced within the body rather than being transferred through the skin.</p>
+    <p><b>Advantages:</b></p>
+    <div class="grid">
+      <div class="card" style="margin:0">🔥 <b>Deep heating</b> of tissues</div>
+      <div class="card" style="margin:0">🎚️ <b>Controlled</b> treatment intensity</div>
+      <div class="card" style="margin:0">📍 <b>Localisation</b> through electrode placement</div>
+      <div class="card" style="margin:0">⚙️ <b>Adjustable</b> heating via circuit parameters</div>
+    </div>
+  </div>
+
+  <div class="card"><h2>D. Principle of Shortwave Diathermy</h2>
+    <p>SWD uses <b>high-frequency alternating current</b> to produce heating within body tissues. Key parameters from the experiment record:</p>
+    <div class="grid">
+      <div class="card" style="margin:0;text-align:center"><div style="font-size:30px;color:var(--blue);font-weight:700">27.12 MHz</div>Operating frequency</div>
+      <div class="card" style="margin:0;text-align:center"><div style="font-size:30px;color:var(--blue);font-weight:700">≈ 11 m</div>Wavelength</div>
+    </div>
+    <p>The alternating current constantly reverses direction in the tissue. Tissue resistance to this rapidly changing current converts electrical energy into heat (Joule heating), so the heat is generated inside the tissue between the electrodes.</p>
+    <svg viewBox="0 0 640 230" style="background:#f2fbfd;border-radius:12px;margin-top:8px">
+      <rect x="40" y="40" width="90" height="26" rx="6" fill="#0b5394"/><text x="85" y="58" fill="#fff" font-size="13" text-anchor="middle">HF Generator</text>
+      <line x1="130" y1="53" x2="210" y2="53" stroke="#0b5394" stroke-width="3" marker-end="url(#a)"/>
+      <rect x="210" y="40" width="120" height="26" rx="6" fill="#1e88c7"/><text x="270" y="58" fill="#fff" font-size="13" text-anchor="middle">Condenser Pads</text>
+      <line x1="330" y1="53" x2="400" y2="53" stroke="#0b5394" stroke-width="3"/>
+      <rect x="400" y="30" width="200" height="150" rx="60" fill="#ffd9b3" stroke="#e67e22" stroke-width="2"/>
+      <text x="500" y="110" font-size="13" text-anchor="middle" fill="#7a3b00">Tissue (conductor)</text>
+      <text x="500" y="128" font-size="12" text-anchor="middle" fill="#7a3b00">Heat = I²R within tissue</text>
+      <text x="40" y="120" font-size="13" fill="#0d2b40">Electrical energy</text>
+      <text x="40" y="136" font-size="13" fill="#0d2b40">→ tissue resistance</text>
+      <text x="40" y="152" font-size="13" fill="#0d2b40">→ heat at depth</text>
+      <text x="40" y="210" font-size="12" fill="#4b6a7d">Figure: conceptual energy path (educational illustration)</text>
+      <defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6z" fill="#0b5394"/></marker></defs>
+    </svg>
+  </div>
+
+  <div class="card"><h2>E. Types of Electrode Arrangement</h2>
+    <p>The arrangement used in this experiment places two condenser electrode pads around the joint to be treated (knee). The electrodes sandwich the treatment region.</p>
+    <svg viewBox="0 0 420 300" style="max-width:420px;display:block;margin:auto">
+      <!-- body -->
+      <rect x="170" y="10" width="60" height="60" rx="28" fill="#f7d7b5" stroke="#b07a4f"/>
+      <rect x="150" y="72" width="100" height="90" rx="20" fill="#f7d7b5" stroke="#b07a4f"/>
+      <rect x="158" y="160" width="36" height="110" rx="14" fill="#f7d7b5" stroke="#b07a4f"/>
+      <rect x="206" y="160" width="36" height="110" rx="14" fill="#f7d7b5" stroke="#b07a4f"/>
+      <!-- knee joint -->
+      <circle cx="176" cy="200" r="16" fill="none" stroke="#e67e22" stroke-width="3" stroke-dasharray="4 3"/>
+      <circle cx="224" cy="200" r="16" fill="none" stroke="#e67e22" stroke-width="3" stroke-dasharray="4 3"/>
+      <!-- treatment region -->
+      <rect x="150" y="180" width="110" height="40" rx="10" fill="#ff9f6b" opacity=".3"/>
+      <!-- electrodes -->
+      <rect x="110" y="160" width="26" height="60" rx="4" fill="#0b5394"/>
+      <rect x="284" y="160" width="26" height="60" rx="4" fill="#0b5394"/>
+      <line x1="136" y1="190" x2="158" y2="190" stroke="#1e88c7" stroke-width="3"/>
+      <line x1="284" y1="190" x2="262" y2="190" stroke="#1e88c7" stroke-width="3"/>
+      <text x="123" y="150" font-size="13" text-anchor="middle" fill="#0b5394">Electrode 1</text>
+      <text x="297" y="150" font-size="13" text-anchor="middle" fill="#0b5394">Electrode 2</text>
+      <text x="176" y="250" font-size="13" text-anchor="middle" fill="#7a3b00">Joint to be treated (knee)</text>
+      <text x="200" y="290" font-size="13" text-anchor="middle" fill="#0d2b40">Treatment region (shaded)</text>
+      <line x1="200" y1="278" x2="200" y2="232" stroke="#ff9f6b" stroke-width="2"/>
+    </svg>
+    <p class="note">Visual reference: knee electrode placement figure in the experiment record. No other electrode arrangements are presented as part of this experiment.</p>
+  </div>
+
+  <div class="card"><h2>F. Circuit Diagram of Shortwave Diathermy</h2>
+    <p>Click any component in the diagram to see its name and function.</p>
+    <div style="overflow-x:auto">
+    <svg id="circ" viewBox="0 0 760 420" style="min-width:640px;background:#f7fcfe;border-radius:12px;border:1px solid #cdeef6">
+      <defs><style>.w{stroke:#0b5394;stroke-width:2;fill:none}.lb{font:12px system-ui;fill:#0d2b40}.bx{fill:#fff;stroke:#0b5394;stroke-width:2}</style></defs>
+      <!-- Mains -->
+      <g class="hl" data-k="mains"><rect class="bx" x="20" y="30" width="90" height="50" rx="8"/><text class="lb" x="65" y="60" text-anchor="middle">Mains supply</text></g>
+      <path class="w" d="M110 55 H150"/>
+      <!-- T1 -->
+      <g class="hl" data-k="t1"><rect class="bx" x="150" y="25" width="80" height="60" rx="8"/><text class="lb" x="190" y="60" text-anchor="middle">T1</text></g>
+      <path class="w" d="M230 40 H280 V30 H330"/>
+      <!-- EHT -->
+      <g class="hl" data-k="eht"><rect class="bx" x="230" y="5" width="0" height="0"/></g>
+      <g class="hl" data-k="eht"><text class="lb" x="300" y="22" font-weight="700">EHT (~4000 V)</text></g>
+      <!-- Triode -->
+      <g class="hl" data-k="triode"><circle cx="360" cy="110" r="36" class="bx"/><text class="lb" x="360" y="106" text-anchor="middle">Triode</text><text class="lb" x="360" y="122" text-anchor="middle">valve</text></g>
+      <path class="w" d="M330 30 V80 M330 110 H324 M396 110 H420"/>
+      <!-- Tank AB || C1 -->
+      <g class="hl" data-k="tank"><rect class="bx" x="420" y="60" width="100" height="100" rx="8"/><text class="lb" x="470" y="80" text-anchor="middle">Tank circuit</text>
+        <path class="w" d="M440 100 q5 -10 10 0 q5 -10 10 0 q5 -10 10 0 q5 -10 10 0"/><text class="lb" x="470" y="125" text-anchor="middle">Coil AB</text></g>
+      <g class="hl" data-k="c1"><path class="w" d="M500 100 V110"/><rect x="530" y="90" width="18" height="34" fill="#fff" stroke="#0b5394" stroke-width="2"/><text class="lb" x="550" y="110">C1</text></g>
+      <path class="w" d="M520 80 V60 H470 V60"/>
+      <!-- feedback CD -->
+      <g class="hl" data-k="cd"><path class="w" d="M330 150 V200 H470 V160"/><rect x="380" y="186" width="60" height="24" class="bx"/><text class="lb" x="410" y="202" text-anchor="middle">Feedback CD</text></g>
+      <!-- Coupling -->
+      <g class="hl" data-k="ef"><rect class="bx" x="560" y="60" width="90" height="50" rx="8"/><text class="lb" x="605" y="90" text-anchor="middle">Coil EF</text></g>
+      <path class="w" d="M520 80 H560"/>
+      <!-- C2 patient tank -->
+      <g class="hl" data-k="c2"><rect x="560" y="140" width="34" height="34" fill="#fff" stroke="#0b5394" stroke-width="2"/><text class="lb" x="577" y="162" text-anchor="middle" font-size="11">C2</text></g>
+      <path class="w" d="M605 110 V140 M594 157 H605 M605 174 V190"/>
+      <!-- Tuning indicator -->
+      <g class="hl" data-k="meter"><circle cx="680" cy="112" r="24" class="bx"/><text class="lb" x="680" y="116" text-anchor="middle" font-size="11">mA</text></g>
+      <path class="w" d="M650 112 H656"/>
+      <!-- Patient -->
+      <g class="hl" data-k="pt"><rect class="bx" x="560" y="250" width="130" height="90" rx="10" fill="#ffe7cf" stroke="#e67e22"/><text class="lb" x="625" y="290" text-anchor="middle">Patient</text><text class="lb" x="625" y="306" text-anchor="middle">electrodes</text></g>
+      <path class="w" d="M605 190 V250"/>
+      <!-- Patient resonator (lower) -->
+      <g class="hl" data-k="res"><rect class="bx" x="400" y="280" width="130" height="60" rx="8"/><text class="lb" x="465" y="304" text-anchor="middle">Patient resonator</text><text class="lb" x="465" y="322" text-anchor="middle">(coupled to EF)</text></g>
+      <path class="w" d="M560 310 H530"/>
+      <!-- R grid leak -->
+      <g class="hl" data-k="r"><path class="w" d="M330 140 V200"/><rect x="250" y="250" width="36" height="16" class="bx"/><text class="lb" x="268" y="284" text-anchor="middle">R</text></g>
+      <path class="w" d="M268 250 V230 H330"/>
+      <text class="lb" x="20" y="410">Click a component to view its name and function.</text>
+    </svg>
+    </div>
+    <div id="info" style="margin-top:12px"><b>Component information</b><br>Select a component on the diagram.</div>
+  </div>
+
+  <div class="card"><h2>G. Circuit Description</h2>
+    <div class="split">
+      <div><h3>1. Oscillating Circuit</h3>
+        <ul>
+          <li><b>Transformer T1</b> steps up the mains to supply the valve filament and the high anode voltage.</li>
+          <li><b>Triode valve</b> acts as the oscillator's active element, sustaining high-frequency current.</li>
+          <li><b>Tank (resonance) circuit:</b> coil AB in parallel with condenser C1 sets the frequency.</li>
+          <li><b>Feedback coil CD</b> returns part of the energy to the grid, generating positive feedback.</li>
+        </ul></div>
+      <div><h3>2. Patient Circuit</h3>
+        <ul>
+          <li><b>Coil EF</b> couples energy from the oscillator by magnetic induction.</li>
+          <li><b>Variable capacitor C2</b> tunes the patient resonator.</li>
+          <li><b>Patient resonator</b> must be tuned to the oscillator for maximum transfer.</li>
+          <li><b>Tuning indicator</b> (meter) peaks at the tuned position.</li>
+          <li><b>Patient electrodes</b> deliver the energy into the tissue.</li>
+        </ul></div>
+    </div>
+    <p>Technical details from the record: anode supply ≈ <b>4000 V</b>; maximum machine power <b>500 W</b>. C2 is adjusted for maximum meter reading during tuning. A <b>thermal delay</b> stops current flowing until the valve filament reaches adequate temperature.</p>
+  </div>
+
+  <div class="card"><h2>H. Intensity Control</h2>
+    <p>Current supplied to the patient can be regulated by three methods:</p>
+    <div class="grid">
+      <div class="card" style="margin:0"><b>1. Anode voltage</b><br>Varying the anode supply changes output.</div>
+      <div class="card" style="margin:0"><b>2. Filament current</b><br>Varying filament heating changes electron emission.</div>
+      <div class="card" style="margin:0;border:2px solid var(--blue2)"><b>3. Grid bias (grid leak R)</b><br><span class="tag">Preferred</span>Preferred for fine regulation in the supplied record.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXPERIMENT ================= -->
+<section class="page" id="experiment">
+  <h1>Virtual SWD Simulator</h1>
+  <p class="note warn"><b>Educational simulation only.</b> Do not connect real electrodes or operate real equipment. Intensity, timer and heating values are illustrative simulation settings, not clinical or device recommendations. The heat-map is a conceptual visualisation, not a measurement of tissue temperature.</p>
+
+  <div class="split">
+    <!-- Machine -->
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <b>SWD UNIT · 27.12 MHz</b>
+        <span><span class="lamp" id="lamp"></span> <span id="pwrTxt" style="font-size:13px">Power: OFF</span></span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin:12px 0;flex-wrap:wrap">
+        <button class="toggle" id="pwr" onclick="togglePower()">POWER</button>
+        <span id="status" class="lcd" style="font-size:14px">STATUS: OFF</span>
+      </div>
+      <div class="ctl"><label>Timer (educational, minutes): <span id="tSel">5</span></label>
+        <input type="range" id="tSlider" min="1" max="30" value="5" oninput="setTimer(this.value)"></div>
+      <div class="ctl"><label>Intensity (illustrative setting 0–10): <span id="iVal">5</span></label>
+        <input type="range" id="iSlider" min="0" max="10" value="5" oninput="setIntensity(this.value)"></div>
+      <div class="ctl"><label>Tuning control (variable C2, 0–100): <span id="cVal">30</span></label>
+        <input type="range" id="cSlider" min="0" max="100" value="30" oninput="setTune(this.value)"></div>
+      <svg class="meter" viewBox="0 0 300 170">
+        <path d="M30 150 A120 120 0 0 1 270 150" fill="#fff" stroke="#7fd8ec" stroke-width="10"/>
+        <g stroke="#0b5394" stroke-width="2"><line x1="150" y1="30" x2="150" y2="42"/><line x1="60" y1="70" x2="70" y2="77"/><line x1="240" y1="70" x2="230" y2="77"/></g>
+        <text x="150" y="20" font-size="12" text-anchor="middle" fill="#7fd8ec">TUNING</text>
+        <line id="needle" x1="150" y1="150" x2="150" y2="50" stroke="#ff5a4e" stroke-width="3" stroke-linecap="round" style="transform-origin:150px 150px;transition:transform .35s ease-out"/>
+        <circle cx="150" cy="150" r="7" fill="#0b5394"/>
+      </svg>
+      <div id="tuneMsg" class="lcd" style="display:block;margin-top:6px;width:100%;text-align:center">Tuning: —</div>
+    </div>
+
+    <!-- Electrode & heating -->
+    <div class="card" style="margin:0">
+      <h3>Patient Treatment Region (Knee)</h3>
+      <p style="font-size:13px;color:var(--mut);margin-top:0">Drag the two condenser pads onto the highlighted zones around the knee.</p>
+      <div class="hm" id="hmWrap">
+        <svg id="body" viewBox="0 0 300 300" style="touch-action:none;background:#f2fbfd;border-radius:12px">
+          <rect x="110" y="10" width="60" height="60" rx="28" fill="#f7d7b5" stroke="#b07a4f"/>
+          <rect x="95" y="72" width="90" height="80" rx="18" fill="#f7d7b5" stroke="#b07a4f"/>
+          <rect x="102" y="150" width="34" height="120" rx="14" fill="#f7d7b5" stroke="#b07a4f"/>
+          <rect x="164" y="150" width="34" height="120" rx="14" fill="#f7d7b5" stroke="#b07a4f"/>
+          <!-- heat overlay -->
+          <ellipse id="heat" cx="150" cy="190" rx="60" ry="26" fill="#ff5a4e" opacity="0" style="filter:blur(10px)"/>
+          <!-- zones -->
+          <rect id="z1" x="58" y="160" width="36" height="60" rx="6" fill="none" stroke="#e67e22" stroke-width="2" stroke-dasharray="5 4"/>
+          <rect id="z2" x="206" y="160" width="36" height="60" rx="6" fill="none" stroke="#e67e22" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="150" y="284" font-size="12" text-anchor="middle" fill="#7a3b00">Knee joint (treatment region)</text>
+          <!-- cables -->
+          <path id="cab1" d="M160 60 Q120 60 100 60" fill="none" stroke="#1e88c7" stroke-width="3" opacity="0"/>
+          <!-- pads -->
+          <g id="p1" style="cursor:grab"><rect x="20" y="60" width="26" height="56" rx="4" fill="#0b5394"/><text x="33" y="52" font-size="11" text-anchor="middle" fill="#0b5394">E1</text></g>
+          <g id="p2" style="cursor:grab"><rect x="254" y="60" width="26" height="56" rx="4" fill="#0b5394"/><text x="267" y="52" font-size="11" text-anchor="middle" fill="#0b5394">E2</text></g>
+        </svg>
+      </div>
+      <div id="elecMsg" class="note" style="margin-top:8px">Electrodes not placed.</div>
+      <div style="margin-top:8px">
+        <button class="btn sec" onclick="connectCables()">Connect pads to output socket</button>
+        <button class="btn sec" onclick="connectMains()">Connect mains cable</button>
+        <button class="btn sec" onclick="resetPads()">Reset pads</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:18px">
+    <div class="card">
+      <h3>Timer</h3>
+      <div class="lcd">Selected: <span id="tSel2">5:00</span></div>
+      <div class="lcd" style="margin-left:8px">Remaining: <span id="rem">05:00</span></div>
+      <div style="margin-top:10px">
+        <button class="btn" id="bStart" onclick="startOp()">Start</button>
+        <button class="btn sec" id="bPause" onclick="pauseOp()">Pause</button>
+        <button class="btn sec" onclick="resetAll()">Reset</button>
+      </div>
+      <div class="note" style="margin-top:10px">Heating visualisation: <span id="heatTxt">Idle</span></div>
+    </div>
+    <div class="card">
+      <h3>Step-by-step Checklist</h3>
+      <div class="progress"><div id="prog"></div></div>
+      <p style="margin:6px 0"><b id="pct">0%</b> complete · Current step: <b id="cur">Connect pads to output socket</b></p>
+      <ul class="check" id="chk"></ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROCEDURE ================= -->
+<section class="page" id="procedure">
+  <h1>Procedure</h1>
+  <div class="card"><h2>Laboratory Procedure</h2>
+    <p>Work through each step below. Completing the step in the virtual simulator ticks it off automatically.</p>
+    <ul class="check" id="procList"></ul>
+    <button class="btn" onclick="go('experiment')">Go to Simulator →</button>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section class="page" id="quiz">
+  <h1>Quiz</h1>
+  <div id="quizBox"></div>
+</section>
+
+<!-- ================= RESULT ================= -->
+<section class="page" id="result">
+  <h1>Result</h1>
+  <div class="card">
+    <h2>Thus, the working of Shortwave Diathermy was studied.</h2>
+    <div class="grid">
+      <div class="card" style="margin:0"><b>Final simulation status</b><br><span id="rStatus">—</span></div>
+      <div class="card" style="margin:0"><b>Checklist completion</b><br><span id="rChk">—</span></div>
+      <div class="card" style="margin:0"><b>Virtual equipment status</b><br><span id="rEq">—</span></div>
+      <div class="card" style="margin:0"><b>Tuning status</b><br><span id="rTune">—</span></div>
+      <div class="card" style="margin:0"><b>Selected timer setting</b><br><span id="rTimer">—</span></div>
+      <div class="card" style="margin:0"><b>Final intensity setting</b><br><span id="rInt">—</span></div>
+      <div class="card" style="margin:0"><b>Quiz score</b><br><span id="rQuiz">Not taken</span></div>
+    </div>
+    <h3>Summary of working principle</h3>
+    <p>An oscillator (triode valve with tank circuit AB‖C1 and feedback coil CD) produces 27.12 MHz current. Coil EF couples this energy into the patient resonator, which is tuned by C2 until the tuning meter peaks. The tissue between the electrodes converts the high-frequency current into heat at depth.</p>
+    <p class="note warn">These results come from a virtual educational simulation and do not represent a real SWD treatment.</p>
+    <button class="btn" onclick="window.print()">Download / Print Results (PDF)</button>
+  </div>
+</section>
+</main>
+
+<footer>Team: Hema G (RA2311013010006) · Rithvika Shekar (RA2311013010043) · Nandhini Settu (RA2311013010048) · Abinayavalli C (RA2311013010055)<br>21BMC402J – Biomedical Equipments for Clinical Applications · Educational simulation only</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const S={power:false,cables:false,mains:false,pad1:false,pad2:false,intensity:5,timer:5,c2:30,left:300,run:null,quizDone:false,score:0,ran:false,tuned:false,heated:false,steps:{}};
+const STEPS=[
+ ["cab","Connect pads to output socket"],
+ ["pads","Place electrodes around the knee treatment region"],
+ ["mains","Connect the simulated mains cable"],
+ ["pwr","Switch ON the unit and observe the power lamp"],
+ ["timer","Set the timer"],
+ ["tune","Tune the patient resonator (peak the meter)"],
+ ["int","Adjust the intensity"],
+ ["start","Start the virtual operation"],
+ ["heat","Observe the conceptual heating visualisation"],
+ ["stop","Stop and reset the simulation"]
+];
+const PROC=["The two condenser pads are connected to the output socket.","The two electrodes are placed around the patient's body where treatment is to be given.","Connect the mains cable and switch ON the unit.","Verify that the Power ON indicator glows.","Set the timer for the desired period."];
+
+function go(p){location.hash=p}
+function show(p){
+  if(!document.getElementById(p))p='home';
+  document.querySelectorAll('section.page').forEach(s=>s.classList.toggle('on',s.id===p));
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(p==='result')renderResult();
+}
+window.addEventListener('hashchange',()=>show(location.hash.slice(1)||'home'));
+
+// ---- checklist ----
+function mark(k){ if(!S.steps[k]){S.steps[k]=true;renderChk();} }
+function renderChk(){
+  const ul=$('chk');ul.innerHTML='';let done=0,cur=null;
+  STEPS.forEach(([k,t])=>{const li=document.createElement('li');li.textContent=t;if(S.steps[k]){li.className='done';done++}else if(!cur)cur=t;ul.appendChild(li)});
+  const p=Math.round(done/STEPS.length*100);
+  $('prog').style.width=p+'%';$('pct').textContent=p+'%';$('cur').textContent=cur||'All steps complete ✔';
+}
+function renderProc(){
+  $('procList').innerHTML='';PROC.forEach((t,i)=>{const li=document.createElement('li');li.textContent=(i+1)+'. '+t;if(procDone(i))li.className='done';$('procList').appendChild(li)});
+}
+function procDone(i){return [S.steps.cab&&S.steps.pads,S.steps.pads,S.steps.mains,S.steps.pwr,S.steps.timer][i]}
+
+// ---- electrodes (drag & drop) ----
+const svg=$('body');
+function pt(e){const r=svg.getBoundingClientRect();const c=e.touches?e.touches[0]:e;return{x:(c.clientX-r.left)*300/r.width,y:(c.clientY-r.top)*300/r.height}}
+const zones={p1:{x:76,y:190,z:'z1'},p2:{x:224,y:190,z:'z2'}};
+['p1','p2'].forEach(id=>{
+  const g=$(id);let drag=false,ox=0,oy=0;
+  const down=e=>{drag=true;const p=pt(e);ox=p.x;oy=p.y;g.style.cursor='grabbing';e.preventDefault()};
+  const move=e=>{if(!drag)return;const p=pt(e);const dx=p.x-ox,dy=p.y-oy;ox=p.x;oy=p.y;const cur=g.dataset.t?g.dataset.t.split(',').map(Number):[0,0];cur[0]+=dx;cur[1]+=dy;g.dataset.t=cur.join(',');g.setAttribute('transform',`translate(${cur[0]},${cur[1]})`);checkPads()};
+  const up=()=>{drag=false;g.style.cursor='grab';snap(id)};
+  g.addEventListener('mousedown',down);g.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('mousemove',move);window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+});
+function padCenter(id){const t=($(id).dataset.t||'0,0').split(',').map(Number);const base=id==='p1'?33:267;return{x:base+t[0],y:88+t[1]}}
+function snap(){}
+function checkPads(){
+  const z1=zones.p1,z2=zones.p2;
+  const a=padCenter('p1'),b=padCenter('p2');
+  const ok1=Math.hypot(a.x-z1.x,a.y-z1.y)<34,ok2=Math.hypot(b.x-z2.x,b.y-z2.y)<34;
+  S.pad1=ok1;S.pad2=ok2;
+  $('z1').setAttribute('stroke',ok1?'#1b8a4b':'#e67e22');$('z2').setAttribute('stroke',ok2?'#1b8a4b':'#e67e22');
+  if(ok1&&ok2){ $('elecMsg').innerHTML='✅ <b>Electrodes correctly positioned</b> around the knee. Connection confirmed.';$('elecMsg').style.background='#e3f7ea';mark('pads'); }
+  else { $('elecMsg').innerHTML=`Pads: E1 ${ok1?'✔':'✘'} · E2 ${ok2?'✔':'✘'} — drag each pad onto its dashed zone.`;$('elecMsg').style.background='';}
+  const c=$('cab1');c.setAttribute('opacity',S.cables?1:0);
+}
+function resetPads(){['p1','p2'].forEach(id=>{$(id).dataset.t='0,0';$(id).removeAttribute('transform')});S.pad1=S.pad2=false;$('z1').setAttribute('stroke','#e67e22');$('z2').setAttribute('stroke','#e67e22');$('elecMsg').textContent='Electrodes not placed.';$('elecMsg').style.background='';}
+
+function connectCables(){S.cables=true;$('cab1').setAttribute('opacity',1);mark('cab');flash('Pads connected to output socket.')}
+function connectMains(){if(!S.cables){flash('Connect the pads to the output socket first.');return}S.mains=true;mark('mains');flash('Mains cable connected.')}
+
+// ---- power ----
+function togglePower(){
+  if(!S.power){
+    if(!S.cables||!S.mains){flash('Connect pads to output socket and the mains cable before switching ON.');return}
+    S.power=true;$('lamp').classList.add('on');$('pwr').classList.add('on');$('pwr').textContent='ON';
+    $('pwrTxt').textContent='Power: ON';$('status').textContent='STATUS: ON';mark('pwr');
+    flash('Unit powered. Power indicator glowing.');
+  } else { stopRun();S.power=false;$('lamp').classList.remove('on');$('pwr').classList.remove('on');$('pwr').textContent='POWER';$('pwrTxt').textContent='Power: OFF';$('status').textContent='STATUS: OFF'; }
+  updateMeter();
+}
+
+// ---- timer / intensity / tuning ----
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function setTimer(v){S.timer=+v;$('tSel').textContent=v;$('tSel2').textContent=fmt(v*60);if(!S.run){S.left=v*60;$('rem').textContent=fmt(S.left)}mark('timer')}
+function setIntensity(v){S.intensity=+v;$('iVal').textContent=v;mark('int');updateHeat()}
+function setTune(v){S.c2=+v;$('cVal').textContent=v;updateMeter();updateHeat()}
+// Resonance at C2=50. Deflection follows a resonance curve.
+function tuneFactor(){const d=(S.c2-50)/12;return Math.exp(-d*d)}
+function updateMeter(){
+  const f=S.power?tuneFactor():0;
+  const ang=-80+160*f*0+ (S.c2-50)*1.6;
+  $('needle').style.transform=`rotate(${S.power?Math.max(-80,Math.min(80,(S.c2-50)*1.6)):0}deg)`;
+  const tuned=S.power&&Math.abs(S.c2-50)<=2;
+  if(!S.power)$('tuneMsg').textContent='Tuning: unit OFF';
+  else if(tuned){$('tuneMsg').textContent='✅ TUNED – maximum meter reading';$('tuneMsg').style.color='#6ff0ff';mark('tune');S.tuned=true}
+  else{$('tuneMsg').textContent='Tuning: adjust C2 for maximum reading';$('tuneMsg').style.color='#9fd3e6'}
+  if(S.power)$('needle').style.opacity=0.35+0.65*f;
+}
+function updateHeat(){
+  if(!S.run){ $('heat').setAttribute('opacity',0); return;}
+  const f=tuneFactor()*(S.intensity/10);
+  $('heat').setAttribute('opacity',f*0.85);
+  $('heat').setAttribute('rx',40+f*40);
+  $('heat').setAttribute('fill',f>0.6?'#ff3b2f':f>0.3?'#ff9f43':'#ffd166');
+  $('heatTxt').textContent=`Conceptual heat level ${Math.round(f*100)}% (illustrative)`;
+}
+function startOp(){
+  if(!S.power){flash('Switch ON the unit first.');return}
+  if(!(S.pad1&&S.pad2)){flash('Place both electrodes around the knee region first.');return}
+  if(S.run)return;
+  mark('start');if(!S.tuned)flash('Tip: tune C2 to the peak for maximum output.');
+  S.run=setInterval(()=>{S.left--;$('rem').textContent=fmt(S.left);updateHeat();if(S.left<=0){stopRun();flash('Simulated timer finished.')}},1000);
+  $('heatTxt').textContent='Running';updateHeat();mark('heat');
+}
+function pauseOp(){ if(S.run){clearInterval(S.run);S.run=null;$('heatTxt').textContent='Paused';updateHeat()} }
+function stopRun(){ if(S.run){clearInterval(S.run);S.run=null;} updateHeat();}
+function resetAll(){
+  stopRun();S.left=S.timer*60;$('rem').textContent=fmt(S.left);$('heatTxt').textContent='Idle';$('heat').setAttribute('opacity',0);
+  if(S.steps.start)mark('stop');
+}
+function flash(m){const el=$('elecMsg');const p=document.createElement('div');p.className='note';p.textContent=m;p.style.animation='fade .4s';$('elecMsg').parentNode.insertBefore(p,$('elecMsg').nextSibling);setTimeout(()=>p.remove(),2800)}
+
+// ---- circuit info panel ----
+const INFO={
+mains:["Mains supply","Provides the 50 Hz AC input that powers the transformer."],
+t1:["Transformer T1","Steps up the supply to heat the valve filament and provide the high anode voltage."],
+eht:["EHT supply","High-tension anode supply of approximately 4000 V."],
+triode:["Triode valve / power tube","Amplifies and sustains the oscillation; its grid is driven by feedback from coil CD."],
+tank:["Tank / resonance circuit","Coil AB in parallel with condenser C1 forming the oscillating circuit that sets the frequency (27.12 MHz)."],
+c1:["Capacitor C1","Parallel with coil AB; with AB determines the oscillator resonant frequency."],
+cd:["Feedback coil CD","Supplies positive feedback to the grid, sustaining oscillation."],
+ef:["Coil EF","Couples the oscillator's energy into the patient circuit by magnetic induction."],
+c2:["Variable capacitor C2","Tunes the patient resonator; adjusted for maximum meter reading."],
+meter:["Tuning indicator","Meter that peaks when the patient resonator is tuned to the oscillator."],
+pt:["Patient electrodes","Condenser pads placed around the treatment region that deliver energy to tissue."],
+res:["Patient resonator","Resonant circuit tuned to the oscillator; receives energy via coil EF."],
+r:["Variable resistance R (grid leak)","Sets grid bias; the preferred method for fine intensity regulation."]
+};
+document.querySelectorAll('#circ .hl').forEach(g=>g.addEventListener('click',()=>{
+  document.querySelectorAll('#circ .hl').forEach(x=>x.classList.remove('sel'));
+  const k=g.dataset.k;if(!k)return;g.classList.add('sel');
+  const i=INFO[k];$('info').innerHTML=`<b>${i[0]}</b><br>${i[1]}`;
+}));
+
+// ---- quiz ----
+const Q=[
+["What does the term 'diathermy' mean?",["Cold therapy","Through heating","Surface cooling","Electrical stimulation"],1,"Diathermy means 'through heating', producing heat deep within tissues."],
+["What is the working principle of SWD?",["Heat transfer from a hot surface","Mechanical vibration","High-frequency alternating current producing heat in tissue","Ultraviolet radiation"],2,"SWD uses high-frequency AC; the body becomes part of the circuit and heats internally."],
+["What is the operating frequency of SWD in the record?",["27.12 kHz","2.712 MHz","27.12 MHz","271.2 MHz"],2,"The record specifies 27.12 MHz."],
+["Approximately what is the wavelength of SWD?",["1 metre","11 metres","110 metres","0.11 metres"],1,"At 27.12 MHz the wavelength is approximately 11 m."],
+["Which equipment is NOT listed in the required equipment?",["Diathermy unit","Electrode pads","Connecting cables","Ventilator"],3,"The required items are the diathermy unit, electrode pads and connecting cables."],
+["What are the electrode pads used in this experiment?",["Suction cups","Condenser electrode pads","ECG leads","Needle electrodes"],1,"Two condenser electrode pads are placed around the treatment region."],
+["Which component forms the oscillating circuit's tank with coil AB?",["Capacitor C2","Condenser C1","Resistor R","Feedback coil EF"],1,"Coil AB is connected in parallel with condenser C1 to form the tank."],
+["What is the role of transformer T1?",["Stepping up supply for filament and anode (EHT) voltage","Measuring tissue temperature","Storing charge in the patient circuit","Filtering the output"],0,"T1 provides the filament heating and high anode voltage."],
+["What does the triode valve do in the oscillator?",["Stores energy permanently","Sustains high-frequency oscillation","Measures the meter reading","Protects the patient from current"],1,"The triode valve sustains the oscillation generated by the tank."],
+["Which coil provides positive feedback in the oscillator?",["Coil AB","Coil CD","Coil EF","Coil T1"],1,"Feedback coil CD generates positive feedback."],
+["What is the role of variable capacitor C2?",["It sets the anode voltage","It tunes the patient resonator to the oscillator","It sets the timer","It controls the lamp"],1,"C2 is adjusted for maximum meter reading to tune the patient resonator."],
+["What does the tuning indicator show?",["Tissue temperature","Maximum reading when the circuits are tuned","Mains voltage","Filament temperature"],1,"The meter peaks when oscillator and patient resonator are tuned."],
+["Which intensity method is preferred for fine regulation in the record?",["Anode voltage","Filament current","Grid bias via grid leak resistance","Mains frequency"],2,"Grid bias through the grid leak is preferred for fine regulation."],
+["What is the approximate anode supply voltage?",["400 V","4000 V","40 V","40000 V"],1,"The anode supply is approximately 4000 V."],
+["Why is there a thermal delay in the circuit?",["To cool the patient","To prevent current until the filament is hot enough","To delay the timer","To reduce mains voltage"],1,"Current does not flow until the valve filament reaches adequate temperature."]
+];
+let qAns=[],qIdx=0;
+function renderQuiz(){
+  qAns=new Array(Q.length).fill(null);qIdx=0;S.score=0;
+  $('quizBox').innerHTML=`<div class="card"><div class="progress"><div id="qp" style="width:0"></div></div><div id="qArea"></div></div>`;
+  drawQ();
+}
+function drawQ(){
+  const [q,opts,c,ex]=Q[qIdx];
+  $('qArea').innerHTML=`<p style="margin:10px 0 0;color:var(--mut)">Question ${qIdx+1} of ${Q.length}</p><h3>${q}</h3>
+   <div id="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>
+   <div id="fb" class="fb"></div>
+   <div style="margin-top:12px"><button class="btn" id="sub">Submit answer</button>
+   <button class="btn sec" id="nxt" style="display:none">${qIdx<Q.length-1?'Next →':'See final score'}</button></div>`;
+  $('qp').style.width=(qIdx/Q.length*100)+'%';
+  let sel=qAns[qIdx];
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ if(qAns[qIdx]!==null)return; document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=+b.dataset.i});
+  $('sub').onclick=()=>{
+    if(sel===null){$('fb').className='fb show no';$('fb').textContent='Please select an option first.';return}
+    if(qAns[qIdx]!==null)return;
+    qAns[qIdx]=sel;
+    document.querySelectorAll('.opt').forEach((b,i)=>{b.disabled=true;if(i===c)b.classList.add('right');if(i===sel&&i!==c)b.classList.add('wrong')});
+    const ok=sel===c;$('fb').className='fb show '+(ok?'ok':'no');
+    $('fb').innerHTML=(ok?'<b>✔ Correct!</b> ':'<b>✘ Incorrect.</b> Correct answer: '+opts[c]+'. ')+ex;
+    $('nxt').style.display='inline-block';
+  };
+  $('nxt').onclick=()=>{ if(qIdx<Q.length-1){qIdx++;drawQ()} else showScore() };
+}
+function showScore(){
+  const score=qAns.reduce((a,v,i)=>a+(v===Q[i][2]?1:0),0);S.score=score;S.quizDone=true;
+  const pct=Math.round(score/Q.length*100);
+  $('quizBox').innerHTML=`<div class="card" style="text-align:center"><h2 style="border:0;padding:0">Final Score</h2>
+   <div style="font-size:54px;font-weight:800;color:var(--blue)">${score} / ${Q.length}</div>
+   <div style="font-size:24px">${pct}%</div>
+   <p>${pct>=80?'Excellent understanding of SWD theory!':pct>=50?'Good progress – review the circuit description.':'Revise the Theory section and try again.'}</p>
+   <button class="btn" onclick="renderQuiz()">↻ Retake Quiz</button></div>`;
+}
+
+// ---- procedure & result ----
+function renderResult(){
+  const done=Object.keys(S.steps).length;
+  $('rStatus').textContent=S.power?'Unit ON (virtual)':'Unit OFF';
+  $('rChk').textContent=`${done} / ${STEPS.length} steps (${Math.round(done/STEPS.length*100)}%)`;
+  $('rEq').textContent=`Pads ${S.cables?'connected':'not connected'} · Mains ${S.mains?'connected':'not connected'} · Power ${S.power?'ON':'OFF'}`;
+  $('rTune').textContent=S.tuned?'Tuned (meter at maximum)':`Not tuned (C2 = ${S.c2})`;
+  $('rTimer').textContent=`${S.timer} min (educational setting)`;
+  $('rInt').textContent=`${S.intensity} / 10 (illustrative)`;
+  $('rQuiz').textContent=S.quizDone?`${S.score}/${Q.length} (${Math.round(S.score/Q.length*100)}%)`:'Not taken';
+}
+document.querySelectorAll('#experiment input[type=range]').forEach(r=>r.addEventListener('change',()=>{}));
+
+// ---- init ----
+renderChk();renderProc();renderQuiz();renderResult();
+setTimer(5);updateMeter();
+show(location.hash.slice(1)||'home');
+// keep procedure ticks in sync
+setInterval(renderProc,800);
+</script>
+</body>
+</html>
